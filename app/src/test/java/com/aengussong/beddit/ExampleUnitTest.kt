@@ -3,7 +3,6 @@ package com.aengussong.beddit
 import org.junit.Test
 
 import org.junit.Assert.*
-import java.util.*
 
 /**
  * Example local unit test, which will execute on the development machine (host).
@@ -13,7 +12,6 @@ import java.util.*
 class ExampleUnitTest {
     @Test
     fun addition_isCorrect() {
-        val uuid = UUID.randomUUID().toString()
         assertEquals(4, 2 + 2)
     }
 }
