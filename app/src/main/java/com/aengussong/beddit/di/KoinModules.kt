@@ -8,9 +8,11 @@ import com.aengussong.beddit.repo.RedditRepo
 import com.aengussong.beddit.repo.local.RedditDatabase
 import com.aengussong.beddit.repo.local.dao.PostDao
 import com.aengussong.beddit.repo.remote.RedditService
+import com.aengussong.beddit.ui.epoxy.RedditPostController
 import com.aengussong.beddit.ui.main.MainViewModel
 import com.aengussong.beddit.util.BASE_URL
 import com.aengussong.beddit.util.LOAD_SIZE
+import com.airbnb.epoxy.paging.PagedListEpoxyController
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -74,4 +76,8 @@ val repoModule = module {
 
 val viewModelModule = module {
     viewModel { MainViewModel(get()) }
+}
+
+val epoxyModule = module{
+    factory<PagedListEpoxyController<RedditPost>> { RedditPostController() }
 }

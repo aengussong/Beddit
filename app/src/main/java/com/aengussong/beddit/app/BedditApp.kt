@@ -18,7 +18,8 @@ class BedditApp : Application() {
                     databaseModule,
                     repoModule,
                     pagingModule,
-                    viewModelModule
+                    viewModelModule,
+                    epoxyModule
                 )
             )
         }

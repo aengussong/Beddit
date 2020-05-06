@@ -20,8 +20,6 @@ data class RedditPostContainer(val data:RedditPost)
 @Entity
 data class RedditPost(@PrimaryKey val name:String, val title:String, val selftext:String, val thumbnail:String){
 
-    fun isThumbnailAvailable():Boolean = URLUtil.isValidUrl(thumbnail)
-
     class DiffUtilCallBack : DiffUtil.ItemCallback<RedditPost>() {
         override fun areItemsTheSame(oldItem: RedditPost, newItem: RedditPost): Boolean {
             return oldItem.name == newItem.name

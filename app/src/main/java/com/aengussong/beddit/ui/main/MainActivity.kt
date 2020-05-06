@@ -4,15 +4,18 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.aengussong.beddit.R
-import com.aengussong.beddit.adapter.RedditPostAdapter
+import com.aengussong.beddit.model.RedditPost
 import com.aengussong.beddit.model.State
+import com.airbnb.epoxy.paging.PagedListEpoxyController
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
+import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
     private val viewModel: MainViewModel by viewModel()
+    private val controller: PagedListEpoxyController<RedditPost> by inject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,10 +28,9 @@ class MainActivity : AppCompatActivity() {
             swipeContainer.isRefreshing = state == State.LOADING
         })
 
+        reddit_recycler.adapter = controller.adapter
         viewModel.bestLiveData.observe(this, Observer { pagedList ->
-            val adapter = RedditPostAdapter()
-            adapter.submitList(pagedList)
-            reddit_recycler.adapter = adapter
+            controller.submitList(pagedList)
         })
 
         viewModel.requestError.observe(this, Observer { retry ->
