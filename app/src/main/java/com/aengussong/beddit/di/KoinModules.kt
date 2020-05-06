@@ -9,6 +9,8 @@ import com.aengussong.beddit.repo.local.RedditDatabase
 import com.aengussong.beddit.repo.local.dao.PostDao
 import com.aengussong.beddit.repo.remote.RedditService
 import com.aengussong.beddit.ui.main.MainViewModel
+import com.aengussong.beddit.util.BASE_URL
+import com.aengussong.beddit.util.LOAD_SIZE
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
@@ -21,7 +23,7 @@ val networkModule = module {
 
     single<Retrofit> {
         Retrofit.Builder()
-            .baseUrl("https://www.reddit.com")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
             .client(OkHttpClient())
@@ -34,12 +36,12 @@ val networkModule = module {
 }
 
 val databaseModule = module {
-    single {
+    single<RedditDatabase> {
         Room.databaseBuilder(androidApplication(), RedditDatabase::class.java, "reddit.db")
             .build()
     }
 
-    single {
+    single<PostDao> {
         get<RedditDatabase>().postDao()
     }
 }
@@ -51,16 +53,15 @@ val pagingModule = module {
             PagedList.Config
                 .Builder()
                 .setEnablePlaceholders(false)
-                .setInitialLoadSizeHint(30)
-                .setPageSize(30)
-                .setPrefetchDistance(15)
+                .setInitialLoadSizeHint(LOAD_SIZE)
+                .setPageSize(LOAD_SIZE)
                 .build()
         )
     }
 }
 
 val repoModule = module{
-    factory { RedditRepo(get(), get(), get()) }
+    single { RedditRepo(get(), get(), get()) }
 }
 
 val viewModelModule = module{

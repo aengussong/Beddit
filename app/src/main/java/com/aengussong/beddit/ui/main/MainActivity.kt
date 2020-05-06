@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.aengussong.beddit.R
 import com.aengussong.beddit.adapter.RedditPostAdapter
+import com.aengussong.beddit.model.State
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -17,6 +18,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        swipeContainer.setOnRefreshListener {
+            viewModel.refresh()
+        }
+        viewModel.refreshState.observe(this, Observer { state ->
+            swipeContainer.isRefreshing = state == State.LOADING
+        })
+
         viewModel.bestLiveData.observe(this, Observer { pagedList ->
             val adapter = RedditPostAdapter()
             adapter.submitList(pagedList)
@@ -24,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         })
 
         viewModel.requestErrors.observe(this, Observer {
-            Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "oops", Toast.LENGTH_SHORT).show()
         })
     }
 }

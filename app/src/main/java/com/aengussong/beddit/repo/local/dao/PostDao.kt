@@ -16,4 +16,6 @@ interface PostDao{
     @Query("SELECT * FROM redditpost")
     fun getPosts(): DataSource.Factory<Int, RedditPost>
 
+    @Query("DELETE FROM redditpost")
+    fun clear()
 }

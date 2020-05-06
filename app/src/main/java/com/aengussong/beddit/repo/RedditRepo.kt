@@ -1,11 +1,19 @@
 package com.aengussong.beddit.repo
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
-import com.aengussong.beddit.model.PagingData
 import com.aengussong.beddit.model.RedditPost
+import com.aengussong.beddit.model.RedditData
+import com.aengussong.beddit.model.State
 import com.aengussong.beddit.repo.local.dao.PostDao
 import com.aengussong.beddit.repo.paging.RedditBoundaryCallback
 import com.aengussong.beddit.repo.remote.RedditService
+import com.aengussong.beddit.util.LOAD_SIZE
+import com.aengussong.beddit.util.getPosts
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 class RedditRepo(
@@ -13,10 +21,11 @@ class RedditRepo(
     private val remote: RedditService,
     private val pagedListBuilder: LivePagedListBuilder<Int, RedditPost>
 ) {
-    fun loadData(coroutineContext: CoroutineContext): PagingData {
+
+    fun loadData(coroutineContext: CoroutineContext): RedditData {
         val boundaryCallback = RedditBoundaryCallback(
             coroutineContext,
-            25,
+            LOAD_SIZE,
             handleResponse = ::insertToDb,
             onLoadData = ::loadFromRemote
         )
@@ -24,13 +33,45 @@ class RedditRepo(
         val livePagedData = pagedListBuilder.setBoundaryCallback(boundaryCallback).build()
         val requestState = boundaryCallback.requestState
 
-        return PagingData(livePagedData, requestState)
+        val refreshTrigger = MutableLiveData<Unit>()
+
+        val refreshState = Transformations.switchMap(refreshTrigger) {
+            refresh(coroutineContext)
+        }
+
+        return RedditData(
+            livePagedData,
+            requestState,
+            refresh = { refreshTrigger.value = null },
+            refreshState = refreshState
+        )
+
+    }
+
+    private fun refresh(coroutineContext: CoroutineContext): LiveData<State> {
+        val refreshState = MutableLiveData<State>()
+
+        CoroutineScope(coroutineContext).launch {
+            refreshState.postValue(State.LOADING)
+            val response = loadFromRemote()
+            if (!response.isSuccessful) {
+                refreshState.postValue(State.ERROR)
+                return@launch
+            }
+            refreshState.postValue(State.SUCCESS)
+            dropDb()
+            insertToDb(response.getPosts())
+        }
+
+        return refreshState
     }
 
     private fun insertToDb(posts: List<RedditPost>) = local.addPosts(posts)
 
+    private fun dropDb() = local.clear()
+
     private suspend fun loadFromRemote(
-        loadSize: Int,
+        loadSize: Int = LOAD_SIZE,
         lastItemName: String? = null
     ) = remote.getBest(loadSize = loadSize, after = lastItemName)
 }

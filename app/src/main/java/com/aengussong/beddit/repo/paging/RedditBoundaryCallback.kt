@@ -5,6 +5,7 @@ import androidx.paging.PagedList
 import com.aengussong.beddit.model.RedditPost
 import com.aengussong.beddit.model.RedditResponse
 import com.aengussong.beddit.model.State
+import com.aengussong.beddit.util.getPosts
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import retrofit2.Response
@@ -27,16 +28,11 @@ class RedditBoundaryCallback(
             val newData = onLoadData(networkPageSize, lastItemName)
 
             if (!newData.isSuccessful) {
-                requestState.postValue(State.RequestError(newData.message()))
+                requestState.postValue(State.ERROR)
                 return@launch
             }
 
-            handleResponse(newData.body()
-                ?.data
-                ?.children
-                ?.map {
-                    it.data
-                } ?: emptyList())
+            handleResponse(newData.getPosts())
         }
     }
 }
