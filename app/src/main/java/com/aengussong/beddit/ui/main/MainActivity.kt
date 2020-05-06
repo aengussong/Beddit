@@ -1,12 +1,12 @@
 package com.aengussong.beddit.ui.main
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import com.aengussong.beddit.R
 import com.aengussong.beddit.adapter.RedditPostAdapter
 import com.aengussong.beddit.model.State
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.synthetic.main.activity_main.*
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -31,8 +31,14 @@ class MainActivity : AppCompatActivity() {
             reddit_recycler.adapter = adapter
         })
 
-        viewModel.requestErrors.observe(this, Observer {
-            Toast.makeText(this, "oops", Toast.LENGTH_SHORT).show()
+        viewModel.requestError.observe(this, Observer { retry ->
+            Snackbar.make(coordinator_layout, "Error occurred", Snackbar.LENGTH_INDEFINITE).apply {
+                setAction("Retry") {
+                    retry.invoke()
+                    dismiss()
+                }
+                show()
+            }
         })
     }
 }

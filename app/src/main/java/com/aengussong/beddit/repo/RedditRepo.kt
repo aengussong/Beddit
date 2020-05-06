@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Transformations
 import androidx.paging.LivePagedListBuilder
-import com.aengussong.beddit.model.RedditPost
 import com.aengussong.beddit.model.RedditData
+import com.aengussong.beddit.model.RedditPost
 import com.aengussong.beddit.model.State
 import com.aengussong.beddit.repo.local.dao.PostDao
 import com.aengussong.beddit.repo.paging.RedditBoundaryCallback
@@ -31,7 +31,21 @@ class RedditRepo(
         )
 
         val livePagedData = pagedListBuilder.setBoundaryCallback(boundaryCallback).build()
-        val requestState = boundaryCallback.requestState
+
+        val retry: LiveData<() -> Unit> =
+            Transformations.map(boundaryCallback.requestError) { errorRequest ->
+                return@map when (errorRequest) {
+                    is RedditBoundaryCallback.ErrorRequest.OnZeroItemsError -> {
+                        { boundaryCallback.onZeroItemsLoaded() }
+                    }
+                    is RedditBoundaryCallback.ErrorRequest.OnItemAtEndError -> {
+                        val lastName = errorRequest.lastItemName
+                        {
+                            boundaryCallback.onItemAtEndLoaded(lastName)
+                        }
+                    }
+                }
+            }
 
         val refreshTrigger = MutableLiveData<Unit>()
 
@@ -41,9 +55,9 @@ class RedditRepo(
 
         return RedditData(
             livePagedData,
-            requestState,
             refresh = { refreshTrigger.value = null },
-            refreshState = refreshState
+            refreshState = refreshState,
+            requestError = retry
         )
 
     }

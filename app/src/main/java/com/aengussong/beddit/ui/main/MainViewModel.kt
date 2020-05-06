@@ -15,9 +15,9 @@ class MainViewModel(private val repo: RedditRepo) : ViewModel() {
 
     val bestLiveData: LiveData<PagedList<RedditPost>> = redditData.data
 
-    val requestErrors: LiveData<State> = redditData.requestState
-
     val refreshState:LiveData<State> = redditData.refreshState
+
+    val requestError = redditData.requestError
 
     fun refresh() = redditData.refresh.invoke()
 }

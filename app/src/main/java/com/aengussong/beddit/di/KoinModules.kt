@@ -13,20 +13,28 @@ import com.aengussong.beddit.util.BASE_URL
 import com.aengussong.beddit.util.LOAD_SIZE
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidApplication
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
+
 val networkModule = module {
+
+    single<OkHttpClient> {
+        val interceptor = HttpLoggingInterceptor()
+        interceptor.level = HttpLoggingInterceptor.Level.BODY
+        OkHttpClient.Builder().addInterceptor(interceptor).build()
+    }
 
     single<Retrofit> {
         Retrofit.Builder()
             .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .addCallAdapterFactory(CoroutineCallAdapterFactory())
-            .client(OkHttpClient())
+            .client(get())
             .build()
     }
 
@@ -60,10 +68,10 @@ val pagingModule = module {
     }
 }
 
-val repoModule = module{
+val repoModule = module {
     single { RedditRepo(get(), get(), get()) }
 }
 
-val viewModelModule = module{
+val viewModelModule = module {
     viewModel { MainViewModel(get()) }
 }

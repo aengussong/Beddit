@@ -5,7 +5,7 @@ import androidx.paging.PagedList
 
 data class RedditData(
     val data: LiveData<PagedList<RedditPost>>,
-    val requestState: LiveData<State>,
     val refresh: () -> Unit,
-    val refreshState: LiveData<State>
+    val refreshState: LiveData<State>,
+    val requestError: LiveData<() -> Unit>
 )
