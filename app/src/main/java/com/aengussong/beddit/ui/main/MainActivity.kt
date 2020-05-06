@@ -21,18 +21,29 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setUpRecycler()
+        setUpRefresh()
+        setUpRetry()
+    }
+
+    private fun setUpRecycler() {
+        reddit_recycler.adapter = controller.adapter
+        viewModel.postsLiveData.observe(this, Observer { pagedList ->
+            controller.submitList(pagedList)
+        })
+    }
+
+    private fun setUpRefresh() {
+        setUpRefresh()
         swipeContainer.setOnRefreshListener {
             viewModel.refresh()
         }
         viewModel.refreshState.observe(this, Observer { state ->
             swipeContainer.isRefreshing = state == State.LOADING
         })
+    }
 
-        reddit_recycler.adapter = controller.adapter
-        viewModel.bestLiveData.observe(this, Observer { pagedList ->
-            controller.submitList(pagedList)
-        })
-
+    private fun setUpRetry() {
         viewModel.requestError.observe(this, Observer { retry ->
             Snackbar.make(coordinator_layout, "Error occurred", Snackbar.LENGTH_INDEFINITE).apply {
                 setAction("Retry") {

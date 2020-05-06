@@ -1,6 +1,5 @@
 package com.aengussong.beddit.model
 
-import android.webkit.URLUtil
 import androidx.recyclerview.widget.DiffUtil
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -14,11 +13,15 @@ data class RedditListing(
     val before: String?
 )
 
-data class RedditPostContainer(val data:RedditPost)
+data class RedditPostContainer(val data: RedditPost)
 
-//todo add mappers? nah too lazy
 @Entity
-data class RedditPost(@PrimaryKey val name:String, val title:String, val selftext:String, val thumbnail:String){
+data class RedditPost(
+    @PrimaryKey val name: String,
+    val title: String,
+    val selftext: String,
+    val thumbnail: String
+) {
 
     class DiffUtilCallBack : DiffUtil.ItemCallback<RedditPost>() {
         override fun areItemsTheSame(oldItem: RedditPost, newItem: RedditPost): Boolean {

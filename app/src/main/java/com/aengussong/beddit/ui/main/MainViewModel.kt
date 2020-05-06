@@ -13,7 +13,7 @@ class MainViewModel(private val repo: RedditRepo) : ViewModel() {
 
     private val redditData = repo.loadData(Dispatchers.IO)
 
-    val bestLiveData: LiveData<PagedList<RedditPost>> = redditData.data
+    val postsLiveData: LiveData<PagedList<RedditPost>> = redditData.data
 
     val refreshState:LiveData<State> = redditData.refreshState
 

@@ -48,7 +48,6 @@ class RedditRepo(
             }
 
         val refreshTrigger = MutableLiveData<Unit>()
-
         val refreshState = Transformations.switchMap(refreshTrigger) {
             refresh(coroutineContext)
         }

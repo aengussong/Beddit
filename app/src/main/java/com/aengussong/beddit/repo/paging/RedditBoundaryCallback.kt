@@ -26,7 +26,6 @@ class RedditBoundaryCallback(
 
     private fun loadData(lastItemName: String?) {
         CoroutineScope(this.coroutineContext).launch {
-
             try {
                 val newData = onLoadData(networkPageSize, lastItemName)
 
