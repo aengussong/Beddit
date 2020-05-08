@@ -79,9 +79,9 @@ class RedditRepo(
         return refreshState
     }
 
-    private fun insertToDb(posts: List<RedditPost>) = local.addPosts(posts)
+    private suspend fun insertToDb(posts: List<RedditPost>) = local.addPosts(posts)
 
-    private fun dropDb() = local.clear()
+    private suspend fun dropDb() = local.clear()
 
     private suspend fun loadFromRemote(
         loadSize: Int = LOAD_SIZE,

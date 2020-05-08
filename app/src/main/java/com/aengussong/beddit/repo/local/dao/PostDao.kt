@@ -11,11 +11,11 @@ import com.aengussong.beddit.model.RedditPost
 interface PostDao{
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addPosts(posts:List<RedditPost>)
+    suspend fun addPosts(posts:List<RedditPost>)
 
     @Query("SELECT * FROM redditpost")
     fun getPosts(): DataSource.Factory<Int, RedditPost>
 
     @Query("DELETE FROM redditpost")
-    fun clear()
+    suspend fun clear()
 }

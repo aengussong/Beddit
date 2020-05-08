@@ -15,7 +15,7 @@ import kotlin.coroutines.CoroutineContext
 class RedditBoundaryCallback(
     private val coroutineContext: CoroutineContext,
     private val networkPageSize: Int,
-    val handleResponse: (List<RedditPost>) -> Unit,
+    val handleResponse: suspend (List<RedditPost>) -> Unit,
     val onLoadData: suspend (Int, String?) -> Response<RedditResponse>
 ) : PagedList.BoundaryCallback<RedditPost>() {
     val requestError: MutableLiveData<ErrorRequest> = MutableLiveData()
