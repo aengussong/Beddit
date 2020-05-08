@@ -34,7 +34,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setUpRefresh() {
-        setUpRefresh()
         swipeContainer.setOnRefreshListener {
             viewModel.refresh()
         }
