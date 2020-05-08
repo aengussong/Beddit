@@ -14,6 +14,7 @@ import com.aengussong.beddit.util.LOAD_SIZE
 import com.aengussong.beddit.util.getPosts
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.IOException
 import kotlin.coroutines.CoroutineContext
 
 class RedditRepo(
@@ -65,15 +66,19 @@ class RedditRepo(
         val refreshState = MutableLiveData<State>()
 
         CoroutineScope(coroutineContext).launch {
-            refreshState.postValue(State.LOADING)
-            val response = loadFromRemote()
-            if (!response.isSuccessful) {
+            try {
+                refreshState.postValue(State.LOADING)
+                val response = loadFromRemote()
+                if (!response.isSuccessful) {
+                    refreshState.postValue(State.ERROR)
+                    return@launch
+                }
+                refreshState.postValue(State.SUCCESS)
+                dropDb()
+                insertToDb(response.getPosts())
+            } catch (ex: IOException) {
                 refreshState.postValue(State.ERROR)
-                return@launch
             }
-            refreshState.postValue(State.SUCCESS)
-            dropDb()
-            insertToDb(response.getPosts())
         }
 
         return refreshState

@@ -17,6 +17,7 @@
         android:id="@+id/description"
         android:textSize="16sp"
         android:layout_marginTop="@dimen/element_margin"
+        android:maxLength="30"
         android:gravity="center_horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
